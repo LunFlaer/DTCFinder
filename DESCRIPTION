@@ -1,0 +1,17 @@
+Package: MalignancyFinder
+Title: Malignant cells finder
+Version: 0.0.0.9000
+Authors@R: c(
+  person(given = 'Wei', family = 'Wei', role = 'aut', email = 'wei.wei@isbscience.org', comment = c(ORCID = '0000-xxxx-xxxx-xxxx')),
+  person(given = "Xiaowei", family = "Yan", role = c("aut", "cre"), email = "xiaowei.yan@isbscience.org", comment = c(ORCID = "0000-0003-4215-1395"))
+  )
+Description: Given a single cell RNAseq profile for a sample of PBMC, cerebrospinal fluid, or plaural effusion with the 10X genomic technology, profile of copy number variation for each cell can be inferred. Based on these CNV profiles including those of immune cells, a clasifier is built to predict which cells should be malignant or not.
+URL: https://github.com/WeiWeiLab/MalignancyFinder
+License: `use_mit_license()` or `use_gpl3_license()`
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.0
+Date/Publication: 2020-06-01
+Depends: 
+    R (>= 2.10)

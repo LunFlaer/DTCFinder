@@ -1,0 +1,40 @@
+#' RSquared Function calculates an adjusted pseudo R-squared statistic for a Guausian model fitted via nls()
+#'
+#' @param model a model fitted via nls()
+#'
+#' @return a pseudo R-squared and an adjusted R-squared are returned.
+#'
+#' @references Yin, P., & Fan, X. (2001). Estimating R2 shrinkage in multiple regression: 
+#'   A comparison of different analytical methods. The Journal of Experimental Education, 69(2), 203-224.
+#' @source \url{https://stats.stackexchange.com/posts/63097/revisions/}
+#'   \url{https://stats.stackexchange.com/questions/48703/what-is-the-adjusted-r-squared-formula-in-lm-in-r-and-how-should-it-be-interpret/}
+#'
+#' @export
+#' @examples
+#' RSquared(model)
+#'
+
+RSquared <- function(model){
+   if (inherits(model, c("glm", "manova", "maov", "mlm")))
+      stop("RSquared() can not be applied to an object of these classes: glm, manova, maov, mlm")
+   if (!inherits(model, c("lm", "aov", "nls")))
+      stop ("RSquared() can only be applied to these classes: 'lm', 'aov' or 'nls'.")
+
+   pred <- predict(model)  # predicted values, predictions
+   n <- length(pred)
+   res <- resid(model)  # summary(model)$residuals
+   w <- weights(model)  # model$weights
+   if (is.null(w)) w <- rep(1, n)
+   rss <- sum(w * res ^ 2)  # weighted sum of squared residuals
+   resp <- pred + res  # actual values, reponses
+   center <- weighted.mean(resp, w)  # weighted mean of reponses
+   rdf <- summary(model)$df[2]  #  residual degrees of freedom, i.e. n - p
+   df.int <- 1  # intercept of degrees of freedom
+   tss <- sum(w * (resp - center)^2)  # total sum of square
+   r.sq <- 1 - rss/tss  # R-squared statistic
+   adj.r.sq <- 1 - (1 - r.sq) * (n - df.int) / rdf  # Wherry's formula
+   out <- list(pseudo.R.squared = r.sq, adj.R.squared = adj.r.sq)
+   return(out)
+}
+
+
