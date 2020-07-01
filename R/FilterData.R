@@ -82,11 +82,9 @@ FilterData <- function(
   if (ncol(features) > 2) {
     data = data[features[,3] == "Gene Expression",]
   }
-
   nFeatures = apply(data, 1, function(x) {sum(x>0, na.rm=TRUE)})
-  nUMIs = apply(data, 2, sum)  # colSums(data)
+  nUMIs = apply(data, 2, sum)  # colSums(data_mat)
   barcodes_selected = which(nFeatures > MinFeatures & nUMIs > MinUMIs)
-  return(data[, barcodes_selected])
+  return(data[barcodes_selected,])
 }
-
 
