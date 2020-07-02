@@ -65,6 +65,7 @@ CNV_Simulator <- function(
     end = as.integer(gene_positions[i-1,5]) + 1
     reg_new = c(chrom = chrom, start = start, end = end, length = (end - start))
     regions = rbind(regions, reg_new)
+    print(regions)
     rownames(regions)[n] <- n
     n = n+1
     if (i<nrow(gene_positions)) {
