@@ -44,6 +44,8 @@ CNV_Simulator <- function(
   i = 1
   chrom = as.integer(gene_positions[i,3])
   start = as.integer(gene_positions[i,4]) - 1
+  
+  RegionSize <- length(regions)
 
   while (i < (nrow(gene_positions) - RegionSize)) {
     for (j in 1:RegionSize) {
