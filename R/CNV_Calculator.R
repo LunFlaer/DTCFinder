@@ -45,7 +45,6 @@ CNV_Simulator <- function(
   chrom = as.integer(gene_positions[i,3])
   start = as.integer(gene_positions[i,4]) - 1
   RegionSize = length(gene_positions)
-  print(RegionSize)
   while (i < (nrow(gene_positions) - RegionSize)) {
     for (j in 1:RegionSize) {
       if (is.na(as.integer(gene_positions[i+j,3]))) {
@@ -65,7 +64,6 @@ CNV_Simulator <- function(
     end = as.integer(gene_positions[i-1,5]) + 1
     reg_new = c(chrom = chrom, start = start, end = end, length = (end - start))
     regions = rbind(regions, reg_new)
-    print(regions)
     rownames(regions)[n] <- n
     n = n+1
     if (i<nrow(gene_positions)) {
@@ -83,6 +81,7 @@ CNV_Simulator <- function(
   GenePositions <- data.frame(ensembl_gene_id=gene_positions[,1], hgnc_symbol=gene_positions[,2], chromosome_name=as.integer(gene_positions[,3]), start_position=as.integer(gene_positions[,4]), end_position=as.integer(gene_positions[,5]))
   MMPP = c()
   for(i in 1:nrow(regions)){
+    print(i)
     genes_region = GenePositions[which(GenePositions[,3]==regions[i,1] & GenePositions[,4]>regions[i,2] & GenePositions[,5]<regions[i,3]), 2]
     if(length(genes_region) >= minGenes){
       expr_region = scale(colMeans(data[intersect(genes_region, row.names(data)),]) - normFactor)
