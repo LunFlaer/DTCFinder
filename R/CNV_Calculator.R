@@ -26,6 +26,7 @@ CNV_Simulator <- function(
 ){
   data = log2(edgeR::cpm(ExprMat, lib.size = NULL, log = F, prior.count = 0) / 10 + 1)  #	Counts per million for ExprMat, scaled by 10, and transformed with pseudo-count = 1 and log2
   data(gene_pos)
+  print(data(gene_pos))
   data = data[intersect(rownames(data), gene_pos[,"hgnc_symbol"]), ]
   
   
