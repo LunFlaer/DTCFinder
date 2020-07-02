@@ -35,8 +35,6 @@ CNV_Simulator <- function(
   data = data[nCells > minCells, ]
   normFactor = colMeans(data)
   
-  cat("data", data)
-  
   gene_positions = gene_pos[sort(match(rownames(data), gene_pos[,2])),]
   gene_positions = gene_positions[!(is.na(suppressWarnings(as.integer(gene_positions[,3])))),]
   gene_positions = gene_positions[which(as.integer(gene_positions[,3])>0), ]
