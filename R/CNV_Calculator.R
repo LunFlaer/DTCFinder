@@ -31,7 +31,7 @@ CNV_Simulator <- function(
   
   data = data[which(rowSums(data) > minUMIs), ]
   nCells = apply(data, 1, function(x){sum(x>0, na.rm=TRUE)})
-  data = data[nCels > minCells, ]
+  data = data[nCells > minCells, ]
   normFactor = colMeans(data)
 
   gene_positions = gene_pos[sort(match(rownames(data), gene_pos[,2])),]
