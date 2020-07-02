@@ -24,6 +24,7 @@ CNV_Simulator <- function(
   minGenes = 100,
   repetitions = 8
 ){
+  print("funcstart")
   data = log2(edgeR::cpm(ExprMat, lib.size = NULL, log = F, prior.count = 0) / 10 + 1)  #	Counts per million for ExprMat, scaled by 10, and transformed with pseudo-count = 1 and log2
   data(gene_pos)
   print(data(gene_pos))
@@ -34,12 +35,11 @@ CNV_Simulator <- function(
   nCells = apply(data, 1, function(x){sum(x>0, na.rm=TRUE)})
   data = data[nCells > minCells, ]
   normFactor = colMeans(data)
-
   gene_positions = gene_pos[sort(match(rownames(data), gene_pos[,2])),]
   gene_positions = gene_positions[!(is.na(suppressWarnings(as.integer(gene_positions[,3])))),]
   gene_positions = gene_positions[which(as.integer(gene_positions[,3])>0), ]
   gene_positions = gene_positions[which(as.integer(gene_positions[,3])<25), ]
-
+  
   regions = c()
   n = 1
   i = 1
@@ -48,8 +48,8 @@ CNV_Simulator <- function(
   
   RegionSize <- length(regions)
 
-  while (i < (nrow(gene_positions) - RegionSize)) {
-    for (j in 1:RegionSize) {
+  while (i < (nrow(gene_positions) - minGenes)) {
+    for (j in 1:minGenes) {
       if (is.na(as.integer(gene_positions[i+j,3]))) {
         chr = 0
       }
@@ -60,7 +60,7 @@ CNV_Simulator <- function(
         break
       }
     }
-    if (j < RegionSize) {
+    if (j < minGenes) {
       j = j-1
     }
     i = i+j+1
@@ -84,6 +84,7 @@ CNV_Simulator <- function(
   GenePositions <- data.frame(ensembl_gene_id=gene_positions[,1], hgnc_symbol=gene_positions[,2], chromosome_name=as.integer(gene_positions[,3]), start_position=as.integer(gene_positions[,4]), end_position=as.integer(gene_positions[,5]))
   MMPP = c()
   for(i in 1:nrow(regions)){
+    print(i)
     genes_region = GenePositions[which(GenePositions[,3]==regions[i,1] & GenePositions[,4]>regions[i,2] & GenePositions[,5]<regions[i,3]), 2]
     if(length(genes_region) >= minGenes){
       expr_region = scale(colMeans(data[intersect(genes_region, row.names(data)),]) - normFactor)
