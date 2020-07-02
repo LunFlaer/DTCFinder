@@ -34,13 +34,12 @@ CNV_Simulator <- function(
   nCells = apply(data, 1, function(x){sum(x>0, na.rm=TRUE)})
   data = data[nCells > minCells, ]
   normFactor = colMeans(data)
-  
+  cat("data", data)
   gene_positions = gene_pos[sort(match(rownames(data), gene_pos[,2])),]
   gene_positions = gene_positions[!(is.na(suppressWarnings(as.integer(gene_positions[,3])))),]
   gene_positions = gene_positions[which(as.integer(gene_positions[,3])>0), ]
   gene_positions = gene_positions[which(as.integer(gene_positions[,3])<25), ]
   
-  cat("gene positions:", gene_positions)
   regions = c()
   n = 1
   i = 1
