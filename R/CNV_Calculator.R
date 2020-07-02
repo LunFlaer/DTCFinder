@@ -44,9 +44,9 @@ CNV_Simulator <- function(
   i = 1
   chrom = as.integer(gene_positions[i,3])
   start = as.integer(gene_positions[i,4]) - 1
-  RegionSize = length(gene_positions)
-  while (i < (nrow(gene_positions) - RegionSize)) {
-    for (j in 1:RegionSize) {
+
+  while (i < (nrow(gene_positions) - minGenes)) {
+    for (j in 1:minGenes) {
       if (is.na(as.integer(gene_positions[i+j,3]))) {
         chr = 0
       }
@@ -57,7 +57,7 @@ CNV_Simulator <- function(
         break
       }
     }
-    if (j < RegionSize) {
+    if (j < minGenes) {
       j = j-1
     }
     i = i+j+1
