@@ -32,28 +32,51 @@ FilterData <- function(
   MinUMIs = 500
 ){
   if (!dir.exists(paths = PathToData)) {
-      stop(paste0("Error: Folder '", PathToData, "' does not exist"))
+    stop(paste0("Error: Folder '", PathToData, "' does not exist"))
   }
   features.file <- file.path(PathToData, 'genes.tsv')
   barcodes.file <- file.path(PathToData, 'barcodes.tsv')
   matrix.file <- file.path(PathToData, 'matrix.mtx')
+  h5matrix.file <- file.path(PathToData, 'filtered_feature_bc_matrix.h5')
+  
+  if (!file.exists(barcodes.file)) {
+    if (file.exists(h5matrix.file)) {
+      message("h5 matrix found. Using it to generate barcode file.")
+      GetFileFromH5(h5matrix.file, filetype="barcode")
+    }
+    else{
+      stop(paste0("Error: Barcode file '", basename(path = barcodes.file), "' missing."))
+    }
+  }
+  if (!file.exists(features.file) ) {
+    if (file.exists(h5matrix.file)) {
+      message("h5 matrix found. Using it to generate genes file.")
+      GetFileFromH5(h5matrix.file, filetype="gene")
+    }
+    else {
+      stop(paste0("Error: Features file '", basename(path = features.file), "' missing"))
+    }
+  }
+  if (!file.exists(matrix.file)) {
+    if (file.exists(h5matrix.file)) {
+      message("h5 matrix found. Using it to generate matrix file.")
+      GetFileFromH5(h5matrix.file, filetype="matrix")
+    }
+    else {
+      stop(paste0("Error: Expression matrix file '", basename(path = matrix.file), "' missing."))
+    }
+  }
+  
   if (!file.exists(features.file)) {
     features.file <- file.path(PathToData, 'features.tsv.gz')
     barcodes.file <- paste0(barcodes.file, ".gz")
     matrix.file <- paste0(matrix.file, ".gz")
   }
-  if (!file.exists(barcodes.file)) {
-    stop(paste0("Error: Barcode file '", basename(path = barcodes.file), "' missing."))
-  }
-  if (!file.exists(features.file) ) {
-    stop(paste0("Error: Features file '", basename(path = features.file), "' missing"))
-  }
-  if (!file.exists(matrix.file)) {
-    stop(paste0("Error: Expression matrix file '", basename(path = matrix.file), "' missing."))
-  }
+  
   if (!require("Matrix", quietly = TRUE)){
     install.packages("Matrix")
   }
+  
   data <- Matrix::readMM(file = matrix.file)	# MatrixMarket format
   barcodes <- readLines(barcodes.file)
   if (all(grepl(pattern = "\\-1$", x = barcodes)) & FeatureSuffixTrim) {
@@ -62,22 +85,22 @@ FilterData <- function(
   colnames(data) <- barcodes
   features <- read.delim(file = features.file, header = FALSE, stringsAsFactors = FALSE)
   if (any(is.na(x = features[, FeatureColumn]))) {
-      warning(
-        'There are some NA features. Replacing NA features with IDs from another column now',
-        call. = FALSE,
-        immediate. = TRUE
-      )
-      na.features <- which(is.na(features[, FeatureColumn]))
-      replacement.column <- ifelse(test = FeatureColumn == 2, yes = 1, no = 2)
-      features[na.features, FeatureColumn] <- features[na.features, replacement.column]
+    warning(
+      'There are some NA features. Replacing NA features with IDs from another column now',
+      call. = FALSE,
+      immediate. = TRUE
+    )
+    na.features <- which(is.na(features[, FeatureColumn]))
+    replacement.column <- ifelse(test = FeatureColumn == 2, yes = 1, no = 2)
+    features[na.features, FeatureColumn] <- features[na.features, replacement.column]
   }
   if (UniqueFeatures) {
-      if (FeatureColumn > ncol(features)) {
-        stop(paste0("feature column ", FeatureColumn,
-                    " larger than the column number of feature.tsv.gz (or genes.tsv) ", ncol(features), ".",
-                    " Try a smaller FeatureColumn argument ( <= ", ncol(features), " )."))
-      }
-      rownames(data) <- make.unique(features[, FeatureColumn])
+    if (FeatureColumn > ncol(features)) {
+      stop(paste0("feature column ", FeatureColumn,
+                  " larger than the column number of feature.tsv.gz (or genes.tsv) ", ncol(features), ".",
+                  " Try a smaller FeatureColumn argument ( <= ", ncol(features), " )."))
+    }
+    rownames(data) <- make.unique(features[, FeatureColumn])
   }
   if (ncol(features) > 2) {
     data = data[features[,3] == "Gene Expression",]
@@ -87,4 +110,3 @@ FilterData <- function(
   barcodes_selected = which(nFeatures > MinFeatures & nUMIs > MinUMIs)
   return(data[barcodes_selected,])
 }
-
